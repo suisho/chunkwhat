@@ -9,6 +9,35 @@ describe("string", function(){
     // object mode
     assert.deepEqual(chunkwhat(parser(selector)), result)
   }
+  it("complex sample", function(){
+    assertion("a > b:active + #c ~ .d, i p",
+  [ [ { tokens: { tag: [ { type: 'tag', name: 'a' } ] },
+      combinator: { before: undefined, after: { type: 'child' } } },
+    { tokens:
+       { tag: [ { type: 'tag', name: 'b' } ],
+         pseudo: [ { type: 'pseudo', name: 'active', data: null } ] },
+      combinator: { before: { type: 'child' }, after: { type: 'adjacent' } } },
+    { tokens:
+       { attribute:
+          [ { type: 'attribute',
+              name: 'id',
+              action: 'equals',
+              value: 'c',
+              ignoreCase: false } ] },
+      combinator: { before: { type: 'adjacent' }, after: { type: 'sibling' } } },
+    { tokens:
+       { attribute:
+          [ { type: 'attribute',
+              name: 'class',
+              action: 'element',
+              value: 'd',
+              ignoreCase: false } ] },
+      combinator: { before: { type: 'sibling' }, after: undefined } } ],
+  [ { tokens: { tag: [ { type: 'tag', name: 'i' } ] },
+      combinator: { before: undefined, after: { type: 'descendant' } } },
+    { tokens: { tag: [ { type: 'tag', name: 'p' } ] },
+      combinator: { before: { type: 'descendant' }, after: undefined } } ] ])
+  })
   it("a.foo", function(){
     var expect =  [ [ {
       tokens: { tag:       [ { type: 'tag', name: 'a' } ],
