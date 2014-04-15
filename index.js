@@ -27,25 +27,18 @@ var isCombinator = function(sub){
 }
 
 var fixupTokens = function(tokens){
-  var item = {
-    tag        : undefined,
-    combinator : undefined,
-    attributes : [],
-  }
+  var item = {}
 
-  tokens.forEach(function(sub){
-    switch(sub.type){
-    case "tag":
-      item.tag = sub
-      break;
-    case "attribute":
-      item.attributes.push(sub)
-      break;
-    }
+  tokens.forEach(function(token){
     // get combinator
-    if(isCombinator(sub)){
-      item.combinator = sub
+    if(isCombinator(token)){
+      item.combinator = token
+      return
     }
+    var arr = item[token.type]
+    if(arr === undefined) arr = []
+    arr.push(token)
+    item[token.type] = arr
   })
   return item
 }
@@ -53,6 +46,16 @@ var fixupTokens = function(tokens){
 var tokens = function(subs){
   return {
     token : subs,
+  }
+}
+
+var chunk = function(){
+  return {
+    tokens : [],
+    combinator : {
+      before : undefined,
+      after : undefined
+    }
   }
 }
 
