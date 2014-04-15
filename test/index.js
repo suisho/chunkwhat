@@ -4,57 +4,79 @@ var assert = require("assert")
 describe("string", function(){
   var assertion = function(selector, expect){
     var result = chunkwhat(selector)
+    //console.log(require("util").inspect(result, {depth:null}))
     assert.deepEqual(result,expect)
     // object mode
     assert.deepEqual(chunkwhat(parser(selector)), result)
   }
   it("a.foo", function(){
-    var expect =  [ [
-    { tag:       [ { type: 'tag', name: 'a' } ],
-      attribute: [ { type: 'attribute',
+    var expect =  [ [ {
+      tokens: { tag:       [ { type: 'tag', name: 'a' } ],
+              attribute: [ { type: 'attribute',
                      name: 'class',
                      action: 'element',
                      value: 'foo',
-                     ignoreCase: false } ] }
-    ] ]
+                     ignoreCase: false } ] },
+      combinator: { before: undefined, after: undefined }
+    } ] ]
     assertion("a.foo", expect)
   })
   it("a:active", function(){
     var expect =  [ [ {
-      tag: [ { type: 'tag', name: 'a' } ],
-      pseudo: [ { type: 'pseudo', name: 'active', data: null }]
+      tokens : {
+        tag: [ { type: 'tag', name: 'a' } ],
+        pseudo: [ { type: 'pseudo', name: 'active', data: null }]
+      },
+      combinator: { before: undefined, after: undefined }
     } ] ]
     assertion("a:active", expect)
   })
   it("a:nth-child(2n+1)", function(){
     var expect =  [ [ {
-      tag: [ { type: 'tag', name: 'a' } ],
-      pseudo: [ { type: 'pseudo', name: 'nth-child', data: '2n+1' } ]
+      tokens :{
+        tag: [ { type: 'tag', name: 'a' } ],
+        pseudo: [ { type: 'pseudo', name: 'nth-child', data: '2n+1' } ]
+      },
+      combinator: { before: undefined, after: undefined }
     } ] ]
     assertion("a:nth-child(2n+1)", expect)
   })
   it("a:foo:bar", function(){
     var expect  = [ [ {
-      tag: [ { type: 'tag', name: 'a' } ],
-      pseudo:
-       [ { type: 'pseudo', name: 'not', data: '.foo' },
-         { type: 'pseudo', name: 'nth-child', data: 'n' } ]
+      tokens : {
+        tag: [ { type: 'tag', name: 'a' } ],
+        pseudo:
+         [ { type: 'pseudo', name: 'not', data: '.foo' },
+           { type: 'pseudo', name: 'nth-child', data: 'n' } ]
+      },
+      combinator: { before: undefined, after: undefined }
      } ] ]
     assertion("a:not(.foo):nth-child(n)", expect)
   })
   it("a,b (comma separated)", function(){
     var expect  = [
-      [ { tag: [ { type: 'tag', name: 'a' } ] } ],
-      [ { tag: [ { type: 'tag', name: 'b' } ] } ]
+      [ { tokens : {tag: [ { type: 'tag', name: 'a' } ] },
+          combinator: { before: undefined, after: undefined }
+      } ],
+      [ { tokens : { tag: [ { type: 'tag', name: 'b' } ] },
+          combinator: { before: undefined, after: undefined }
+
+      } ]
     ]
     assertion("a ,b", expect)
   })
   it("a b", function(){
     var expect  = [
-      [
-        { tag: [ { type: 'tag', name: 'a' } ],
-          combinator: { type: 'descendant' } },
-        { tag: [ { type: 'tag', name: 'b' } ] }
+      [ { tokens : { tag: [ { type: 'tag', name: 'a' } ] },
+          combinator: {
+            before : undefined, after : { type: 'descendant' }
+          }
+        },
+        { tokens : { tag: [ { type: 'tag', name: 'b' } ] } ,
+          combinator: {
+            before : { type: 'descendant' } , after : undefined
+          }
+        }
       ]
     ]
     assertion("a b", expect)
@@ -62,9 +84,16 @@ describe("string", function(){
   it("a > b", function(){
     var expect  = [
       [
-        { tag: [ { type: 'tag', name: 'a' } ],
-          combinator: { type: 'child' } },
-        { tag: [ { type: 'tag', name: 'b' } ] }
+        { tokens : { tag: [ { type: 'tag', name: 'a' } ] },
+          combinator: {
+            before: undefined, after: { type: 'child' }
+          }
+        },
+        { tokens : { tag: [ { type: 'tag', name: 'b' } ] },
+          combinator: {
+            before: { type: 'child' }, after: undefined
+          }
+        }
       ]
     ]
     assertion("a > b", expect)
@@ -72,9 +101,16 @@ describe("string", function(){
   it("a ~ b", function(){
     var expect  = [
       [
-        { tag: [ { type: 'tag', name: 'a' } ],
-          combinator: { type: 'sibling' } },
-        { tag: [ { type: 'tag', name: 'b' } ] }
+        { tokens : { tag: [ { type: 'tag', name: 'a' } ] },
+          combinator: {
+            before: undefined, after: { type: 'sibling' }
+          }
+        },
+        { tokens : { tag: [ { type: 'tag', name: 'b' } ] },
+          combinator: {
+            before: { type: 'sibling' }, after: undefined
+          }
+        }
       ]
     ]
     assertion("a ~ b", expect)
@@ -82,47 +118,70 @@ describe("string", function(){
   it("a + b", function(){
     var expect  = [
       [
-        { tag: [ { type: 'tag', name: 'a' } ],
-          combinator: { type: 'adjacent' } },
-        { tag: [ { type: 'tag', name: 'b' } ] }
+        { tokens : { tag: [ { type: 'tag', name: 'a' } ] },
+          combinator: {
+            before: undefined, after: { type: 'adjacent' }
+          }
+        },
+        { tokens : { tag: [ { type: 'tag', name: 'b' } ] },
+          combinator: {
+            before: { type: 'adjacent' }, after: undefined
+          }
+        }
       ]
     ]
     assertion("a + b", expect)
   })
   it("a+>b", function(){
     var expect  =[ [
-      { tag: [ { type: 'tag', name: 'a' } ],
-        combinator: { type: 'adjacent' } },
-
-      { combinator: { type: 'child' } },
-
-      { tag: [ { type: 'tag', name: 'b' } ] }
-    ] ]
+        { tokens : { tag: [ { type: 'tag', name: 'a' } ] },
+          combinator: {
+            before: undefined, after: { type: 'adjacent' }
+          }
+        },
+        {
+          tokens : {},
+          combinator: {
+            before: { type: 'adjacent' }, after: {type: 'child'}
+          }
+        },
+        { tokens : { tag: [ { type: 'tag', name: 'b' } ] },
+          combinator: {
+            before: { type: 'child' }, after: undefined
+          }
+        }
+      ]
+    ]
     assertion("a +> b", expect)
   })
-  it("*", function(){
-    var expect = [ [
-       { universal: [ { type: 'universal' } ],
-        combinator: { type: 'descendant' } },
-        { tag: [ { type: 'tag', name: 'a' } ] }
-    ] ]
+  it("* a", function(){
+    var expect = [ [ {
+      tokens : { universal: [ { type: 'universal' } ] },
+      combinator: { before: undefined, after: { type: 'descendant' } }
+    },{
+      tokens : { tag: [ { type: 'tag', name: 'a' } ] },
+      combinator: { before: { type: 'descendant' }, after: undefined }
+    } ] ]
     assertion("* a", expect)
   })
   it("div.baz#foo (mult attributes)", function(){
-    var expect = [ [
-      { tag: [ { type: 'tag', name: 'div' } ],
-        attribute:
-         [ { type: 'attribute',
-             name: 'class',
-             action: 'element',
-             value: 'baz',
-             ignoreCase: false },
-           { type: 'attribute',
-             name: 'id',
-             action: 'equals',
-             value: 'foo',
-             ignoreCase: false } ] }
-    ] ]
+    var expect = [ [ {
+       tokens : {
+          tag: [ { type: 'tag', name: 'div' } ],
+          attribute:
+           [ { type: 'attribute',
+               name: 'class',
+               action: 'element',
+               value: 'baz',
+               ignoreCase: false },
+             { type: 'attribute',
+               name: 'id',
+               action: 'equals',
+               value: 'foo',
+               ignoreCase: false } ]
+        },
+        combinator : { before : undefined , after :undefined }
+    } ] ]
     assertion("div.baz#foo", expect)
   })
 })

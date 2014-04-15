@@ -8,8 +8,9 @@ module.exports = function(selectors){
 
   return selectors.map(function(selector){
     // chunk selectors
-    return chunkSelector(selector).map(function(group){
-      return fixupTokens(group.token)
+    return chunkSelector(selector).map(function(chunk){
+      chunk.tokens = fixupTokens(chunk.tokens)
+      return chunk
     })
   })
 }
@@ -30,11 +31,6 @@ var fixupTokens = function(tokens){
   var item = {}
 
   tokens.forEach(function(token){
-    // get combinator
-    if(isCombinator(token)){
-      item.combinator = token
-      return
-    }
     var arr = item[token.type]
     if(arr === undefined) arr = []
     arr.push(token)
@@ -43,17 +39,12 @@ var fixupTokens = function(tokens){
   return item
 }
 
-var tokens = function(subs){
-  return {
-    token : subs,
-  }
-}
 
-var chunk = function(){
+var chunkSet = function(beforeCombinator){
   return {
     tokens : [],
     combinator : {
-      before : undefined,
+      before : beforeCombinator,
       after : undefined
     }
   }
@@ -62,16 +53,22 @@ var chunk = function(){
 // Split by combinator
 var chunkSelector = function(selector){
   var groups = []
-  var chunk = []
+  var chunk = chunkSet()
+  var beforeCombinator = null
 
-  selector.forEach(function(token){
-    chunk.push(token)
-    if(isCombinator(token)){
-      groups.push(tokens(chunk))
-      chunk = []
+  selector.forEach(function(sub){
+
+    if(isCombinator(sub)){
+      beforeCombinator = chunk.combinator.after = sub
+      groups.push(chunk)
+      // renew chunk
+      chunk = chunkSet(beforeCombinator)
+    }else{
+      chunk.tokens.push(sub)
     }
+
   })
   // push ends
-  groups.push(tokens(chunk))
+  groups.push(chunk)
   return groups
 }
