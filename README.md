@@ -55,5 +55,7 @@ expect = [ [
         { type: 'pseudo', name: 'bar', data: null }  // :bar
       ]
     },
-    combinator: { before: undefined, after: undefined } } ] ]
+    combinator: { before: undefined, after: undefined }
+  }
+] ]
 ```
