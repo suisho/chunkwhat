@@ -46,6 +46,38 @@ var chunkSet = function(beforeCombinator){
   }
 }
 
+var Chunk = function(token, beforeCombinator, afterCombinator){
+  this.token = token
+  this.tag =
+  this.beforeCombinator = beforeCombinator
+  this.afterCombinator = afterCombinator
+}
+
+Chunk.prototype.stringify = function(withBeforeCombinator, withAfterCombinator){
+  var simpleSelectors = {
+  	child    : ">",
+  	parent   : "<",
+  	sibling  : "~",
+  	adjacent : "+"
+  };
+  var actionTypes = {
+    exists: 'undefined',
+    equals: '',
+    element: '~',
+    start: '^',
+    end: '$',
+    any: '*',
+    not: '!',
+    hyphen: '|'
+  }
+
+  var str = ""
+  if(withBeforeCombinator){
+
+  }
+
+}
+
 var SubSelector = function(selector){
   var chunks = chunkSelector(selector)
   chunks.forEach(function(chunk){

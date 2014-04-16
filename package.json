@@ -12,6 +12,7 @@
     "CSSwhat": "^0.4.5"
   },
   "devDependencies": {
+    "matcha": "^0.5.0",
     "mocha": "^1.18.2"
   }
 }
