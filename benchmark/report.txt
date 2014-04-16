@@ -1,0 +1,10 @@
+parser
+  pseudopseudo ................................... 115,295 op/s
+  chunkwhat ...................................... 41,438 op/s
+
+only chunk
+  chunkwhat ...................................... 79,543 op/s
+
+Suites:  2
+Benches: 3
+Elapsed: 3,729.57 ms
