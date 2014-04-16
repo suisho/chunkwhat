@@ -12,14 +12,12 @@ module.exports = function(selectors){
 }
 
 var isCombinator = function(sub){
-  switch(sub.type){
-  case "child":
-  case "parent":
-  case "sibling":
-  case "adjacent":
-  case "descendant":
-    return true
-  }
+  var type = sub.type
+  if(type == "child")      return true
+  if(type == "parent")     return true
+  if(type == "sibiling")   return true
+  if(type == "adjacent")   return true
+  if(type == "descendant") return true
   return false
 }
 
