@@ -6,7 +6,7 @@ var parsed = CSSwhat(selector)
 
 
 suite("parser", function(){
-  bench("pseudopseudo", function(){
+  bench("CSSWhat", function(){
     CSSwhat(selector)
   })
   bench("chunkwhat", function(){
