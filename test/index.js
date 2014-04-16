@@ -5,7 +5,9 @@ describe("string", function(){
   var assertion = function(selector, expect){
     var result = chunkwhat(selector)
     //console.log(require("util").inspect(result, {depth:null}))
-    assert.deepEqual(result,expect)
+    result.forEach(function(subSelector, i){
+      assert.deepEqual(subSelector.chunks,expect[i])
+    })
     // object mode
     assert.deepEqual(chunkwhat(parser(selector)), result)
   }

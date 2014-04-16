@@ -7,11 +7,7 @@ module.exports = function(selectors){
   }
 
   return selectors.map(function(selector){
-    // chunk selectors
-    return chunkSelector(selector).map(function(chunk){
-      chunk.tokens = fixupTokens(chunk.tokens)
-      return chunk
-    })
+    return new SubSelector(selector)
   })
 }
 
@@ -49,6 +45,15 @@ var chunkSet = function(beforeCombinator){
     }
   }
 }
+
+var SubSelector = function(selector){
+  var chunks = chunkSelector(selector)
+  chunks.forEach(function(chunk){
+    chunk.tokens = fixupTokens(chunk.tokens)
+  })
+  this.chunks = chunks
+}
+
 
 // Split by combinator
 var chunkSelector = function(selector){
